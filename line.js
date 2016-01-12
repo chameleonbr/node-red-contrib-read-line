@@ -17,17 +17,11 @@ module.exports = function (RED) {
 
         node.on('input', function (msg) {
             if (msg.file !== undefined && msg.file !== "") {
-                file = msg.file;
+                file = msg.filename;
             } else {
                 file = node.file;
             }
             var liner = new Liner(file);
-
-            var oldPayload = null;
-
-            if (msg['payload'] !== undefined) {
-                var oldPayload = msg['payload'];
-            }
             var i = 0;
             
             liner.on('readable', function () {
@@ -46,8 +40,8 @@ module.exports = function (RED) {
                 node.error(err);
             });
             liner.on('end', function () {
-                msg['lines'] = i;
-                msg['payload'] = oldPayload;
+                msg['line'] = null;
+                msg['payload'] = i;
                 node.send([null, msg]);
             });
 
