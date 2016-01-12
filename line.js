@@ -16,7 +16,7 @@ module.exports = function (RED) {
         });
 
         node.on('input', function (msg) {
-            if (msg.file !== undefined && msg.file !== "") {
+            if (msg.filename !== undefined && msg.filename !== "") {
                 file = msg.filename;
             } else {
                 file = node.file;
