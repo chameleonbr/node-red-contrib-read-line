@@ -7,6 +7,8 @@ module.exports = function (RED) {
         this.name = n.name;
         this.topic = n.topic;
         this.file = n.file;
+        this.offset = n.offset;
+        this.limit = n.limit;
         var node = this;
 
 
@@ -23,24 +25,36 @@ module.exports = function (RED) {
             }
             var liner = new Liner(file);
             var i = 0;
-            
+            var lim = 0;
+                        
             liner.on('readable', function () {
                 while (true) {
                     var line = liner.read();
                     if (line === null) {
                         break;
                     }
+                    if(i < node.offset){
+                        i++;
+                        continue;
+                    }
+                    if(node.limit > 0 && lim >= node.limit){
+                        liner.end();
+                        break;
+                    }
+                        
                     msg['payload'] = line;
-                    msg['line'] = i;
-                    node.send([msg, null]);
+                    msg['line'] = i+1;
+                    
+                    lim++;
                     i++;
+                    node.send([msg, null]);
                 }
             });
             liner.on('error', function (err) {
                 node.error(err);
             });
             liner.on('end', function () {
-                msg['line'] = null;
+                msg['line'] = undefined;
                 msg['payload'] = i;
                 node.send([null, msg]);
             });
