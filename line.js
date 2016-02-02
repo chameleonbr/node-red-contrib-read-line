@@ -42,8 +42,7 @@ module.exports = function (RED) {
                         break;
                     }
                         
-                    msg['payload'] = line;
-                    msg['line'] = i+1;
+                    var msg = {payload: line, line: i+1 };
                     
                     lim++;
                     i++;
@@ -54,8 +53,7 @@ module.exports = function (RED) {
                 node.error(err);
             });
             liner.on('end', function () {
-                msg['line'] = undefined;
-                msg['payload'] = i;
+                var msg = {payload: i, line: undefined };
                 node.send([null, msg]);
             });
 
