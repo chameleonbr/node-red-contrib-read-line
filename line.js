@@ -69,6 +69,4 @@ module.exports = function (RED) {
 
     }
     RED.nodes.registerType("read-line", ReadLine);
-
-
 };
