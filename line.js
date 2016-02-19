@@ -41,22 +41,28 @@ module.exports = function (RED) {
                         liner.end();
                         break;
                     }
-                        
-                    msg['payload'] = line;
-                    msg['line'] = i+1;
+
+                    // clone message to pass all attributes
+                    var new_msg = RED.util.cloneMessage(msg) || {};
+                    new_msg.payload = line;
+                    new_msg.line = i+1;
                     
                     lim++;
                     i++;
-                    node.send([msg, null]);
+                    node.send([new_msg, null]);
                 }
             });
             liner.on('error', function (err) {
                 node.error(err);
             });
             liner.on('end', function () {
-                msg['line'] = undefined;
-                msg['payload'] = i;
-                node.send([null, msg]);
+
+                // clone message to pass all attributes
+                var new_msg = RED.util.cloneMessage(msg) || {};
+                new_msg.payload = i;
+                new_msg.line = undefined;
+
+                node.send([null, new_msg]);
             });
 
         });
