@@ -1,6 +1,7 @@
 module.exports = function (RED) {
     var Liner = require('liner');
 
+
     function ReadLine(n) {
         RED.nodes.createNode(this, n);
         this.name = n.name;
@@ -17,7 +18,6 @@ module.exports = function (RED) {
         });
 
         node.on('input', function (msg) {
-            var file = null;
             if (msg.filename !== undefined && msg.filename !== "") {
                 file = msg.filename;
             } else {
@@ -63,4 +63,6 @@ module.exports = function (RED) {
 
     }
     RED.nodes.registerType("read-line", ReadLine);
+
+
 };
