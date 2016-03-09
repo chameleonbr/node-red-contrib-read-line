@@ -1,5 +1,5 @@
 module.exports = function (RED) {
-    var Liner = require('liner');
+    var Liner = require('linebyline');
 
 
     function ReadLine(n) {
@@ -24,33 +24,29 @@ module.exports = function (RED) {
                 file = node.file;
             }
             var liner = new Liner(file);
-            var i = 0;
             var lim = 0;
+	    var i = 0;
                         
-            liner.on('readable', function () {
-                while (true) {
-                    var line = liner.read();
-                    if (line === null) {
-                        break;
-                    }
-                    if(i < node.offset){
-                        i++;
-                        continue;
-                    }
-                    if(node.limit > 0 && lim >= node.limit){
-                        liner.end();
-                        break;
-                    }
-
-                    // clone message to pass all attributes
-                    var new_msg = RED.util.cloneMessage(msg) || {};
-                    new_msg.payload = line;
-                    new_msg.line = i+1;
-                    
-                    lim++;
-                    i++;
-                    node.send([new_msg, null]);
-                }
+            liner.on('line', function (line, lineCount, byteCount) {
+		if (line === null) {
+		    return;
+		}
+		if(lineCount < node.offset){
+		    i++;
+		    return;
+		}
+		if(node.limit > 0 && lim >= node.limit){
+		    liner.end();
+		    return;
+		}
+		// clone message to pass all attributes
+		var new_msg = RED.util.cloneMessage(msg) || {};
+		new_msg.payload = line;
+		new_msg.line = i+1;
+		
+		lim++;
+		i++;
+		node.send([new_msg, null]);
             });
             liner.on('error', function (err) {
                 node.error(err);
